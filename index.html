@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>LeaderBoard</title>
+	<script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+	<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+</head>
+<body>
+    <div class="container">
+    	<table id="dataFirebase">
+    		<tr>
+    			<th>Player</th>
+    			<th>Score</th>
+    		</tr>
+    	</table>
+    	<div>
+    		<input class="leaderboardName" type="text" id="nameInput" placeholder="Enter name">
+   			<input class="leaderboardScore" type="text" id="scoreInput" placeholder="Record your score...">
+    	</div>
+    </div>
+	<script type="text/javascript">
+		var myDataRef = new Firebase('https://gkb72ax8drx.firebaseio-demo.com/scoreList');
+        //to store data in firebase
+        $("#scoreInput").keypress(function(e){
+        	if(e.keyCode==13){
+        		var name=$("#nameInput").val();
+        		var value=Number($("#scoreInput").val());
+        		var user=myDataRef.child(name);
+        		user.setWithPriority({name: name, score: value},value);
+		 		$("#nameInput").val('');
+		 		$("#scoreInput").val('');
+		 		//location.reload();
+        	}
+        });
+        //to retrieve data from firebase after querying and sorting
+        var postQuery=myDataRef.limit(5);
+        postQuery.on('value',function(snapshot){
+        	var data=snapshot.val();
+            //data is in javascript object form, let it be
+        	console.log(data);
+        	console.log(data.Vikrum.score);
+        	var jsn=JSON.stringify(data);
+        	console.log(jsn);
+        	console.log(JSON.parse(jsn));
+        	console.log(jQuery.parseJSON(jsn));
+        	//convert json to javascript object
+        	var p=jQuery.parseJSON(jsn);
+
+            $.each(p, function( key, value ) {
+			  	console.log(key+":"+ "name="+value.name+":score"+value.score);
+			  	var newScoreRow = $("#dataFirebase");
+                newScoreRow.has("td")
+			  	newScoreRow.append
+			  		("<tr><td>"+value.name+"</td><td>"+value.score+"</td></tr>");
+			  	  //($("<td/>").append($("<em/>").text(value.name)));
+
+    			//newScoreRow.append($("<td/>").text(value.score));
+			});
+
+        	
+        });
+
+	</script>
+	
+</body>
+</html>
